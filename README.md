@@ -20,7 +20,7 @@ Made for group admins who want a cleaner, safer chat without constant moderation
 
 ## 🚀 How to Use
 
-1. **Add [@NoSpamBot](https://telegram.me/NoSpamBot)** to your group  
+1. **Add [@NoSpamBot](https://telegram.me/antispampalbot)** to your group  
 2. **Make it an admin** with **“Delete Messages”** permission  
 3. That’s it! It starts working immediately 🎉
 
@@ -65,5 +65,5 @@ python bot.py
 By [Harshit Shrivastav](https://github.com/Harshit-shrivastav)  
 Free, open-source, and always improving.
 
-[![Telegram](https://img.shields.io/badge/Telegram-Bot-blue?logo=telegram)](https://telegram.me/NoSpamBot)  
+[![Telegram](https://img.shields.io/badge/Telegram-Bot-blue?logo=telegram)](https://telegram.me/antispampalbot)  
 [![GitHub](https://img.shields.io/badge/GitHub-Repo-black?logo=github)](https://github.com/Harshit-shrivastav/NoSpamBot)
