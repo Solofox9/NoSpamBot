@@ -1,10 +1,10 @@
-FROM python:latest
-RUN mkdir -p /usr/src/nospambot
-WORKDIR /usr/src/nospambot
-COPY package.json ./
-COPY package.json ./
-RUN npm install
-RUN package.json
-COPY . .
+version: '3'
 
-CMD ["node", "index.js"]
+services:
+  app:
+    image: node:20.10.0
+    restart: unless-stopped
+    command: bash -c "yarn && yarn start"
+    volumes:
+      - '.:/usr/src/app'
+    working_dir: /usr/src/app
