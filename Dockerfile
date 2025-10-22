@@ -1,10 +1,6 @@
-version: '3'
-
-services:
-  app:
-    image: node:20.10.0
-    restart: unless-stopped
-    command: bash -c "yarn && yarn start"
-    volumes:
-      - '.:/usr/src/app'
-    working_dir: /usr/src/app
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["python", "nospam_bot.py"]
