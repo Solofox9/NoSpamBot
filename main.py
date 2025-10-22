@@ -18,8 +18,8 @@ import aiohttp
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = os.getenv("ADMIN_ID")
+BOT_TOKEN = os.getenv("8435522221:AAFuO-TftQhCb56xBuy3GgboQXBvEsuSqFQ")
+ADMIN_ID = os.getenv("1573111356")
 if not BOT_TOKEN:
     raise ValueError("BOT_TOKEN not found in .env")
 
@@ -33,7 +33,7 @@ dp = Dispatcher()
 _http_session: Optional[aiohttp.ClientSession] = None
 
 # SQLite setup
-DB_FILE = "bot_data.db"
+DB_FILE = "mongodb+srv://tdanimehub_db_user:cPdMT253KSZpE11Z@helper.wallqjf.mongodb.net/?retryWrites=true&w=majority&appName=Helper"
 SETTINGS_CACHE: Dict[int, Dict] = {}
 
 def init_db():
