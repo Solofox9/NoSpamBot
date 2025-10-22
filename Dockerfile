@@ -4,4 +4,4 @@ COPY package.json .
 COPY package-lock.json .
 RUN package-lock.json .
 COPY ...
-CMD ["main.py"]
+CMD ["main.py" "package-lock.json" " package.json"]
