@@ -1,66 +1,72 @@
-# main.py
+import asyncio
+import logging
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from aiogram.enums import ChatType
+import sqlite3
 
-import os
-import time
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+# Config
+TOKEN = "8210861967:AAFWXYLVZOgX-SPKkaIzZ_TxSiNfLsw0q2U"
+ADMIN_ID = 1573111356
 
-# 1) టోకెన్ సెట్ చేయండి
-TELEGRAM_BOT_TOKEN = os.getenv("8210861967:AAFWXYLVZOgX-SPKkaIzZ_TxSiNfLsw0q2U")  # పోస్టు చేయడానికి შესაბამისად సెట్ చేయండి
+# Logging
+logging.basicConfig(level=logging.INFO)
 
-# 2) సరళమైన స్పామ్-రేట-లిమిట్: యూజర్‌కి ఇంకొంచెట్లు మెసేజ్‌ಗಳು పంపొద్దు
-USER_TIMEOUT = 30  # ప్రతి యూజర్ కి 30 సెకండ్ల తరువాత మాత్రమే మెసేజ్
-user_last_seen = {}
+# Bot and Dispatcher
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
 
-# 3) బేసిక్ క్రిఇటింగ్: కొద్దిపాటి కీవర్డ్-ఆధారిత స్పందన
-KEY_RESPONSES = {
-    "hello": "హैलो! మీరు ఎలా ఉన్నారు?",
-    "hi": "హాయ్! మీకు ఎలా సహాయం చెయ్యము?",
-    "help": "మీ ప్రశ్నలను అడగండి. నేను సానుకూల సహాయం చెయ్యడానికి ప్రయత్నిస్తాను.",
-}
+# SQLite DB
+def init_db():
+    conn = sqlite3.connect("mongodb+srv://tdanimehub_db_user:cPdMT253KSZpE11Z@helper.wallqjf.mongodb.net/?retryWrites=true&w=majority&appName=Helper")
+    c = conn.cursor()
+    c.execute("mongodb+srv://tdanimehub_db_user:cPdMT253KSZpE11Z@helper.wallqjf.mongodb.net/?retryWrites=true&w=majority&appName=Helper"mongodb+srv://tdanimehub_db_user:3fPbmCdShf91FPZ9@storage1.gwel1e6.mongodb.net/?retryWrites=true&w=majority&appName=Storage1"
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER UNIQUE,
+            chat_id INTEGER,
+            msg_count INTEGER DEFAULT 0
+        )
+    """)
+    conn.commit()
+    conn.close()
 
-# 4) కమాండ్ హ్యాండ్లర్
-def start(update: Update, context: CallbackContext) -> None:
-    user_id = update.effective_user.id
-    user_last_seen[user_id] = time.time()
-    update.message.reply_text("నమస్కారం! నేను మీకు సహాయం చేసేది నమూనా బటన్ని. సబమ్ కాకుండా మాట్లాడుదాం!")
+init_db()
 
-# 5) మెసేజ్ హ్యాండ్లర్: స్పామ్-రెస్ట్‌లను అడ్డుకోవడం
-def handle_message(update: Update, context: CallbackContext) -> None:
-    user_id = update.effective_user.id
-    now = time.time()
+# Command: /start
+@dp.message(Command("start"))
+async def start(message: types.Message):
+    await message.reply("Spam bot detector is active!")
 
-    last = user_last_seen.get(user_id, 0)
-    if now - last < USER_TIMEOUT:
-        # తక్కువ సమయం లో many messages: స్వల్ప ప్రతిస్పందన ఇవ్వటం
-        update.message.reply_text("దయచేసి కొద్దిగా ఆసక్తిగా స్పందించండి. స్క్రిప్ట్ బద్దలు సંતુష్టంగా ఉంది.")
-        return
+# Message handler
+@dp.message()
+async def check_spam(message: types.Message):
+    user_id = message.from_user.id
+    chat_id = message.chat.id
 
-    user_last_seen[user_id] = now
-    text = update.message.text.lower()
+    conn = sqlite3.connect("spam_bot.db")
+    c = conn.cursor()
 
-    # 6) కీవర్డ్-ఆధారిత స్పందన
-    for key, resp in KEY_RESPONSES.items():
-        if key in text:
-            update.message.reply_text(resp)
-            return
+    # Check or create user
+    c.execute("SELECT msg_count FROM users WHERE user_id = ?", (user_id,))
+    row = c.fetchone()
 
-    # 7) డిఫాడ్ట్ రిస్పాన్స్
-    update.message.reply_text("మీ సందేశాన్ని స్వీకరించాము. నేను త్వరగా సమాధానాన్ని చూసి తిరిగి చెప్పుతాను.")
+    if row:
+        msg_count = row[0] + 1
+        c.execute("UPDATE users SET msg_count = ? WHERE user_id = ?", (msg_count, user_id))
+    else:
+        c.execute("INSERT INTO users (user_id, chat_id, msg_count) VALUES (?, ?, 1)", (user_id, chat_id))
+    
+    conn.commit()
+    conn.close()
 
-# 8) main వాటర్: బాటింగ్స్-కాంపైల్
-def main():
-    if not TELEGRAM_BOT_TOKEN:
-        raise SystemExit("టోకెన్ సెట్ చేయబడాలి. TELEGRAM_BOT_TOKEN వాతావరణ చర పరిశీలించండి.")
+    # Spam check
+    if row and msg_count > 5:  # Example threshold
+        await message.reply(f"User {user_id} might be spamming!")
 
-    updater = Updater(TELEGRAM_BOT_TOKEN, use_context=True)
-    dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
-
-    updater.start_polling()
-    updater.idle()
+# Main
+async def main():
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
