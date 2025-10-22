@@ -18,12 +18,12 @@ import aiohttp
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = os.getenv("ADMIN_ID")
+BOT_TOKEN = os.getenv("8210861967:AAFWXYLVZOgX-SPKkaIzZ_TxSiNfLsw0q2U")
+ADMIN_ID = os.getenv("1573111356")
 if not BOT_TOKEN:
     raise ValueError("BOT_TOKEN not found in .env")
 
-API_URL = "https://vector.profanity.dev"
+API_URL = "http://my.telegram.org"
 DEFAULT_CONFIDENCE = 60
 CACHE_FILE = "profanity_cache.json"
 
