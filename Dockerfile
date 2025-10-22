@@ -4,4 +4,4 @@ WORKDIR /usr/src/nospambot
 COPY package.json ./
 RUN npm install
 COPY . .
-CMD ["node", "index.js"]
+CMD ["node", "index.js", "package.json"]
